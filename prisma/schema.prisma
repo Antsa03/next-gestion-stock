@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Produit {
+  id_produit  Int      @id @default(autoincrement())
+  designation String
+  pu          Float
+  stock       Int      @default(0)
+  sorties     Sortie[]
+  lots        Lot[]
+  Entree      Entree[]
+}
+
+model Entree {
+  id_entree     Int       @id @default(autoincrement())
+  id_produit    Int
+  id_bon_entree Int
+  qte_entree    Int
+  id_lot        Int
+  lot           Lot       @relation(fields: [id_lot], references: [id_lot], onDelete: Cascade, onUpdate: Cascade)
+  produit       Produit   @relation(fields: [id_produit], references: [id_produit], onDelete: Cascade, onUpdate: Cascade)
+  bon_entree    BonEntree @relation(fields: [id_bon_entree], references: [id_bon_entree], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model BonEntree {
+  id_bon_entree Int      @id @default(autoincrement())
+  date_entree   DateTime @default(now())
+  entrees       Entree[]
+}
+
+model Sortie {
+  id_sortie     Int       @id @default(autoincrement())
+  id_produit    Int
+  id_bon_sortie Int
+  qte_sortie    Int
+  id_lot        Int
+  type_sortie   String
+  produit       Produit   @relation(fields: [id_produit], references: [id_produit], onDelete: Cascade, onUpdate: Cascade)
+  bon_sortie    BonSortie @relation(fields: [id_bon_sortie], references: [id_bon_sortie], onDelete: Cascade, onUpdate: Cascade)
+  lot           Lot       @relation(fields: [id_lot], references: [id_lot], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model BonSortie {
+  id_bon_sortie Int      @id @default(autoincrement())
+  date_sortie   DateTime @default(now())
+  sorties       Sortie[]
+}
+
+model Lot {
+  id_lot          Int      @id @default(autoincrement())
+  id_produit      Int
+  date_production DateTime
+  date_peremption DateTime
+  quantite_lot    Int
+  entrees         Entree[]
+  sorties         Sortie[]
+  produit         Produit  @relation(fields: [id_produit], references: [id_produit], onDelete: Cascade, onUpdate: Cascade)
+}
